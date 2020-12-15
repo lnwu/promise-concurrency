@@ -1,34 +1,48 @@
 import ava, { TestInterface } from "ava";
 import Sinon from "sinon";
-import { ConcurrencyResult } from "../concurrency-result";
 import { defer } from "../defer";
 
 import { PromiseConcurrencyController } from "../index";
 
-const test = ava as TestInterface<{
-  timer: Sinon.SinonFakeTimers;
-}>;
+const test = ava;
 
-test.beforeEach((t) => {
-  t.context.timer = Sinon.useFakeTimers();
-});
-
-test.afterEach((t) => {
-  t.context.timer.restore();
-});
-
-const generateFixtureTask = <T>(defer: number, resolvedValue: T) => {
+export const generateFixtureTask = <T>(defer: number, resolvedValue: T) => {
   return () =>
-    new Promise<T>((resolve) => {
-      console.log("start run", resolvedValue);
-      setTimeout(() => {
-        console.log("end run", resolvedValue);
-        resolve(resolvedValue);
-      }, defer);
-    });
+    new Promise<T>((resolve) =>
+      setTimeout(() => resolve(resolvedValue), defer)
+    );
 };
 
-test("should be able to run tasks", async (t) => {
+test("should be able to run all tasks", async (t) => {
+  const timer = Sinon.useFakeTimers();
+  const taskNames = ["task1", "task2"];
+
+  const task1 = generateFixtureTask(1000, taskNames[0]);
+  const task2 = generateFixtureTask(2000, taskNames[1]);
+
+  const controller = new PromiseConcurrencyController<string>(2);
+
+  const result = controller.run(task1, task2);
+
+  async function runSpec() {
+    let index = 0;
+    for await (const value of result) {
+      t.is(value, taskNames[index]);
+      index++;
+    }
+    t.is(index, taskNames.length);
+    d.resolve();
+  }
+
+  const d = defer<void>();
+  runSpec();
+
+  timer.tickAsync(2000);
+  return d.promise;
+});
+
+test("should task 3000ms when concurrency set to 1", async (t) => {
+  const timer = Sinon.useFakeTimers();
   const taskNames = ["task1", "task2"];
 
   const task1 = generateFixtureTask(1000, taskNames[0]);
@@ -44,13 +58,13 @@ test("should be able to run tasks", async (t) => {
       t.is(value, taskNames[index]);
       index++;
     }
+    t.is(index, taskNames.length);
     d.resolve();
   }
 
   const d = defer<void>();
-  runSpec();
+  await timer.tickAsync(3000);
 
-  t.context.timer.tick(2000);
-  result.done();
+  runSpec();
   return d.promise;
 });
