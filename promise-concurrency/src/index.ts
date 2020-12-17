@@ -4,7 +4,6 @@ export type Task<T> = () => Promise<T>;
 
 export class PromiseConcurrencyController<T> {
   activeCount = 0;
-  pendingCount = 0;
   private concurrencyConfig: number;
   private pendingTasks: Task<T>[] = [];
   private activeTasks: Task<T>[] = [];
@@ -19,7 +18,9 @@ export class PromiseConcurrencyController<T> {
     this.pendingTasks.push(...tasks);
 
     this.applyJobs();
-    this.runTasks();
+    if (this.activeCount === 0) {
+      this.runTasks();
+    }
 
     return this.result;
   }
@@ -27,6 +28,10 @@ export class PromiseConcurrencyController<T> {
   async stop(): Promise<void> {}
 
   resume() {}
+
+  public get pendingCount() {
+    return this.pendingTasks.length;
+  }
 
   private applyJobs = () => {
     while (this.activeTasks.length < this.concurrencyConfig) {
@@ -41,12 +46,14 @@ export class PromiseConcurrencyController<T> {
   private runTasks = async () => {
     if (this.activeTasks.length > 0) {
       const activeTasksValues = this.activeTasks.map(async (task) => {
+        this.activeCount++;
         const v = await task();
         this.result.yield(v);
         this.activeTasks.shift();
+        this.activeCount--;
       });
 
-      await Promise.race(activeTasksValues);
+      await Promise.all(activeTasksValues);
       this.result.done();
 
       this.applyJobs();

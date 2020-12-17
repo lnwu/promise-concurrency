@@ -11,7 +11,7 @@
 
 ## 评判标准
 
-- 完成需求
-- 补充 `PromiseConcurrencyController` 的单元测试
+- [x] 完成需求
+- [x] 补充 `PromiseConcurrencyController` 的单元测试
 - 工程化 (CI/CD/Lint 等)
 - 代码风格
