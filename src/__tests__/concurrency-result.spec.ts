@@ -36,6 +36,7 @@ test("should be able to throw error", async (t) => {
   const err = new TypeError("You bad bad");
   result.reject(err);
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
     for await (const _ of result) {
     }
     throw new TypeError("Unreachable error");
@@ -82,6 +83,7 @@ test("should be able to reject when some value still deferred", (t) => {
 
   async function runSpec() {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
       for await (const _ of result) {
       }
       throw new TypeError("Unreachable error");

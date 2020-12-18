@@ -8,8 +8,8 @@ export class PromiseConcurrencyController<T> {
   private pendingTasks: Task<T>[] = [];
   private activeTasks: Task<T>[] = [];
   private result: ConcurrencyResult<T>;
-  private shouldStop: boolean = false;
-  private stopped: boolean = false;
+  private shouldStop = false;
+  private stopped = false;
 
   constructor(public readonly size: number) {
     this.concurrencyConfig = size;
@@ -32,24 +32,26 @@ export class PromiseConcurrencyController<T> {
       return Promise.resolve();
     } else {
       this.shouldStop = true;
-      return;
     }
   }
 
-  resume() {
+  resume(): void {
     this.shouldStop = false;
     this.stopped = false;
     this.reRunTasks();
   }
 
-  public get pendingCount() {
+  public get pendingCount(): number {
     return this.pendingTasks.length;
   }
 
   private applyActiveTasks = () => {
     while (this.activeTasks.length < this.concurrencyConfig) {
       if (this.pendingTasks.length > 0) {
-        this.activeTasks.push(this.pendingTasks.shift()!);
+        const nextTask = this.pendingTasks.shift();
+        if (nextTask) {
+          this.activeTasks.push(nextTask);
+        }
       } else {
         break;
       }
@@ -64,6 +66,8 @@ export class PromiseConcurrencyController<T> {
           const resolvedValue = await task();
           this.result.yield(resolvedValue);
         } catch (error) {
+          // record error
+          console.error(error);
         } finally {
           this.activeTasks.shift();
           this.activeCount--;

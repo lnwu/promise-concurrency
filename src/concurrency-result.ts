@@ -13,7 +13,7 @@ export class ConcurrencyResult<T> implements AsyncIterator<T, void, void> {
 
   reject(e: unknown) {
     if (this.defersQueue.length) {
-      this.defersQueue.shift()!.reject(e);
+      this.defersQueue.shift()?.reject(e);
     } else {
       this.rejectReason = e;
     }
@@ -21,7 +21,7 @@ export class ConcurrencyResult<T> implements AsyncIterator<T, void, void> {
 
   yield(value: T) {
     if (this.defersQueue.length) {
-      this.defersQueue.shift()!.resolve(value);
+      this.defersQueue.shift()?.resolve(value);
     } else {
       this.values.push(value);
     }
@@ -41,6 +41,7 @@ export class ConcurrencyResult<T> implements AsyncIterator<T, void, void> {
     if (this.values.length) {
       return {
         done: false as const,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         value: this.values.shift()!,
       };
     }

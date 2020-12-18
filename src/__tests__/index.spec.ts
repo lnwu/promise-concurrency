@@ -20,7 +20,7 @@ export const generateFixtureTask = <T>(
   defer: number,
   resolvedValue: T,
   rejectValue?: T
-) => {
+): (() => Promise<T>) => {
   return () =>
     new Promise<T>((resolve, reject) => {
       setTimeout(() => {
@@ -156,15 +156,8 @@ test("should has correct active&pending account in times", async (t) => {
   const controller = new PromiseConcurrencyController<string>(2);
 
   controller.run(task1, task2);
-  const result = controller.run(task3, task4, task5);
-  async function runSpec() {
-    let index = 0;
-    for await (const _ of result) {
-      index++;
-    }
-    t.is(index, taskNames.length);
-    d.resolve();
-  }
+  controller.run(task3, task4, task5);
+
   const d = defer<void>();
   t.is(controller.activeCount, 2);
   t.is(controller.pendingCount, 3);
@@ -178,7 +171,7 @@ test("should has correct active&pending account in times", async (t) => {
   t.is(controller.activeCount, 0);
   t.is(controller.pendingCount, 0);
 
-  runSpec();
+  d.resolve();
   return d.promise;
 });
 

@@ -7,15 +7,37 @@
   "author": "longyinan.brooklyn@bytedance.com",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "test": "ava --verbose",
+    "lint": "eslint ./src --ext .ts"
+  },
   "devDependencies": {
     "@swc-node/register": "^1.0.1",
     "@types/sinon": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
     "ava": "^3.13.0",
+    "eslint": "^7.15.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "husky": "^4.3.6",
+    "lint-staged": "^10.5.3",
+    "prettier": "^2.2.1",
     "sinon": "^9.2.1",
     "typescript": "^4.0.5"
   },
-  "scripts": {
-    "test": "ava --verbose"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn test"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "yarn lint --fix"
+    ]
   },
   "ava": {
     "extensions": [
@@ -31,5 +53,8 @@
     "files": [
       "./**/*.spec.{ts,tsx}"
     ]
+  },
+  "dependencies": {
+    "eslint-plugin-prettier": "^3.3.0"
   }
 }
