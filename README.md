@@ -1,47 +1,17 @@
-# Working with intelligent people
+# Promise 任务并发控制器
 
-## 团队
+## 需求描述
 
-### 前端架构
+1. [`PromiseConcurrencyController`](./src/index.ts) 构造函数接受一个 `number` 类型的参数，作为并发数量。
+2. 实例上有一个 `run` 方法，接受一组返回 `Promise` 的函数，多次调用 `run` 方法时传入的函数将以传入的顺序执行，同一个 `PromiseConcurrencyController` 实例不管调用多少次 `run` 方法，传入的任务都需要按照构造**函数中定义的并发数量运行**。
+3. `run` 方法返回 `ConcurrencyResult` 实例，它实现了 `AsyncIterator<T, void, void>` 接口，也就是说它可以用 `for ... await` 语句进行迭代。[`ConcurrencyResult`](./src/concurrency-result.ts) 类我们已经帮你实现，并且有相应的测试代码: [`concurrency-result.spec.ts`](./src/__tests__/concurrency-result.spec.ts), 你可以在当前目录下执行 `yarn test` 查看测试结果。
+4. `stop` 方法可以暂停控制器，这个方法返回一个 `Promise`, 等待当前正在执行的所有 `Promise` **resolve/reject** 之后返回的 `Promise` 被 `resolve`，该方法返回的 `Promise` 只有可能被 `resolve` 不会被 `reject`。如果已经被暂停则直接 `resolve` 返回的 `Promise`。
+5. `resume` 方法可以继续控制器的执行，用于控制器被 `stop` 之后恢复执行。
+6. 可以通过实例上的 `activeCount` 与 `pendingCount` 获得正在运行的任务个数以及等待个数。
 
-#### 工作内容
+## 评判标准
 
-> Web 相关应用并不局限传统前端应用，还包括 **_Hybrid 应用（JsBridge/Flutter/自研类 Flutter 引擎/RN 等）_** , **_Node SSR/API 服务_** ， **_各种类型 RPC 服务_** 等。
-
-- 负责 Web 相关应用的性能/体验监控、分析和优化
-  - 研发/共建字节内部前端监控 SDK，该 SDK 已经接入了字节几乎所有形态的前端应用
-  - 根据不同的业务形态和平台制定体验与性能相关的监控指标，并落地到监控 SDK 中
-  - 根据线上监控数据与线下准入平台采集到的数据，在重点业务进行性能/体验的分析和优化，并沉淀出通用解决方案
-- 负责企业级性能和体验相关的技术产品、方案的开发和推广工作
-  - 字节内部使用的**性能准入平台**功能研发和产品规划
-  - **性能准入平台**相关的各种研发流程工具、公司内部其它平台对接
-- 保障业务性能/体验不劣化
-  - 通过研发流程控制、工程化手段保障业务的性能/体验不劣化，感知到劣化时 Push 业务团队进行性能优化
-  - 作为业务团队的 **BP(Business Partner)** 指导业务团队进行性能/体验优化
-  - 从架构视角对各技术场景抽象通用优化方案
-
-#### 技术栈
-
-- `React@17`
-- `GraphQL`
-- `RxJS`
-- `TypeScript`
-- `NestJS`
-- `PWA` (Incoming)
-- `WebSocket` (Incoming)
-- `Rust WebAssembly/N-API` (Incoming)
-
-#### 展现你的能力
-
-> 这里的题目只是对你某一方面能力的考核，解决这里的题目可以让我们对你的能力有更深刻的了解，但**_并不意味着你不擅长解决此类问题就与我们团队无缘_**，同时也不意味着**_你擅长很好的解决这些问题就一定适合我们团队_**。
-
-> 完成解答后请将解题的 repo、简历等相关信息发送到 **longyinan.brooklyn@bytedance.com**，也可以通过微信联系: `bHlud2VrbG0=`
-
-> 不想做题，直接投递: [内推链接](https://job.toutiao.com/s/J9koQPs)
-
-- [Promise 任务并发控制器](./promise-concurrency)
-- [编写简单的 `TypeScript transform plugin`](./ts-plugin)
-
-### 海外短视频业务
-
-> WIP
+- [x] 完成需求
+- [x] 补充 `PromiseConcurrencyController` 的单元测试
+- 工程化 (CI/CD/Lint 等)
+- 代码风格
