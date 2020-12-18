@@ -181,3 +181,65 @@ test("should has correct active&pending account in times", async (t) => {
   runSpec();
   return d.promise;
 });
+
+test("should has no task running when invoke stop", async (t) => {
+  const taskNames = ["task1", "task2", "task3", "task4", "task5"];
+
+  const task1 = generateFixtureTask(1000, taskNames[0]);
+  const task2 = generateFixtureTask(2000, taskNames[1]);
+  const task3 = generateFixtureTask(2000, taskNames[2]);
+  const task4 = generateFixtureTask(2000, taskNames[3]);
+  const task5 = generateFixtureTask(1000, taskNames[3]);
+
+  const controller = new PromiseConcurrencyController<string>(2);
+
+  controller.run(task1, task2, task3, task4, task5);
+
+  const d = defer<void>();
+
+  t.is(controller.activeCount, 2);
+  t.is(controller.pendingCount, 3);
+  await controller.stop();
+  await t.context.timer.tickAsync(2000);
+  t.is(controller.activeCount, 0);
+  t.is(controller.pendingCount, 3);
+
+  await t.context.timer.tickAsync(5000);
+  t.is(controller.activeCount, 0);
+  t.is(controller.pendingCount, 3);
+
+  d.resolve();
+  return d.promise;
+});
+
+test("should run pending tasks when invoke resume", async (t) => {
+  const taskNames = ["task1", "task2", "task3", "task4", "task5"];
+
+  const task1 = generateFixtureTask(1000, taskNames[0]);
+  const task2 = generateFixtureTask(2000, taskNames[1]);
+  const task3 = generateFixtureTask(2000, taskNames[2]);
+  const task4 = generateFixtureTask(2000, taskNames[3]);
+  const task5 = generateFixtureTask(1000, taskNames[3]);
+
+  const controller = new PromiseConcurrencyController<string>(2);
+
+  controller.run(task1, task2, task3, task4, task5);
+
+  const d = defer<void>();
+
+  await controller.stop();
+  await t.context.timer.tickAsync(10000);
+  t.is(controller.activeCount, 0);
+  t.is(controller.pendingCount, 3);
+
+  controller.resume();
+  await t.context.timer.tickAsync(2000);
+  t.is(controller.activeCount, 1);
+  t.is(controller.pendingCount, 0);
+  await t.context.timer.tickAsync(1000);
+  t.is(controller.activeCount, 0);
+  t.is(controller.pendingCount, 0);
+
+  d.resolve();
+  return d.promise;
+});
