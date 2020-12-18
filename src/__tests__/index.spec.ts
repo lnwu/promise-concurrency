@@ -16,11 +16,19 @@ test.afterEach((t) => {
   t.context.timer.restore();
 });
 
-export const generateFixtureTask = <T>(defer: number, resolvedValue: T) => {
+export const generateFixtureTask = <T>(
+  defer: number,
+  resolvedValue: T,
+  rejectValue?: T
+) => {
   return () =>
-    new Promise<T>((resolve) => {
+    new Promise<T>((resolve, reject) => {
       setTimeout(() => {
-        resolve(resolvedValue);
+        if (rejectValue) {
+          reject(rejectValue);
+        } else {
+          resolve(resolvedValue);
+        }
       }, defer);
     });
 };
@@ -47,6 +55,34 @@ test("should be able to run all tasks", async (t) => {
 
   const d = defer<void>();
   await t.context.timer.tickAsync(3000);
+
+  runSpec();
+  return d.promise;
+});
+
+test("should catch one result if other tasks rejected", async (t) => {
+  const taskNames = ["task1", "task2", "task3"];
+
+  const task1 = generateFixtureTask(1000, taskNames[0], "reject1");
+  const task2 = generateFixtureTask(2000, taskNames[1]);
+  const task3 = generateFixtureTask(2000, taskNames[2], "reject3");
+
+  const controller = new PromiseConcurrencyController<string>(1);
+
+  const result = controller.run(task1, task2, task3);
+
+  async function runSpec() {
+    let index = 0;
+    for await (const value of result) {
+      t.is(value, "task2");
+      index++;
+    }
+    t.is(index, 1);
+    d.resolve();
+  }
+
+  const d = defer<void>();
+  await t.context.timer.tickAsync(5000);
 
   runSpec();
   return d.promise;

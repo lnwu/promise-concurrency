@@ -47,10 +47,14 @@ export class PromiseConcurrencyController<T> {
     if (this.activeTasks.length > 0) {
       const activeTasksValues = this.activeTasks.map(async (task) => {
         this.activeCount++;
-        const v = await task();
-        this.result.yield(v);
-        this.activeTasks.shift();
-        this.activeCount--;
+        try {
+          const resolvedValue = await task();
+          this.result.yield(resolvedValue);
+        } catch (error) {
+        } finally {
+          this.activeTasks.shift();
+          this.activeCount--;
+        }
       });
 
       await Promise.all(activeTasksValues);
