@@ -19,7 +19,7 @@ export class PromiseConcurrencyController<T> {
   run(...tasks: Task<T>[]): ConcurrencyResult<T> {
     this.pendingTasks.push(...tasks);
 
-    this.applyJobs();
+    this.applyActiveTasks();
     if (this.activeCount === 0) {
       this.runTasks();
     }
@@ -39,15 +39,14 @@ export class PromiseConcurrencyController<T> {
   resume() {
     this.shouldStop = false;
     this.stopped = false;
-    this.applyJobs();
-    this.runTasks();
+    this.reRunTasks();
   }
 
   public get pendingCount() {
     return this.pendingTasks.length;
   }
 
-  private applyJobs = () => {
+  private applyActiveTasks = () => {
     while (this.activeTasks.length < this.concurrencyConfig) {
       if (this.pendingTasks.length > 0) {
         this.activeTasks.push(this.pendingTasks.shift()!);
@@ -73,13 +72,16 @@ export class PromiseConcurrencyController<T> {
 
       await Promise.all(activeTasksValues);
       this.result.done();
-
-      if (this.shouldStop) {
-        this.stopped = true;
-      } else {
-        this.applyJobs();
-        this.runTasks();
-      }
+      this.reRunTasks();
     }
   };
+
+  private reRunTasks() {
+    if (this.shouldStop) {
+      this.stopped = true;
+    } else {
+      this.applyActiveTasks();
+      this.runTasks();
+    }
+  }
 }
