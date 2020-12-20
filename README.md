@@ -1,5 +1,7 @@
 # Promise 任务并发控制器
 
+![Build](https://github.com/lnwu/promise-concurrency/workflows/Build/badge.svg)
+
 ## 需求描述
 
 1. [`PromiseConcurrencyController`](./src/index.ts) 构造函数接受一个 `number` 类型的参数，作为并发数量。
