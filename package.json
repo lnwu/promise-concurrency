@@ -4,9 +4,8 @@
   "description": "Promise concurrency pool",
   "main": "lib/index.js",
   "repository": "https://github.com/ies-fe-sh/hire",
-  "author": "longyinan.brooklyn@bytedance.com",
+  "author": "wind2729@gmail.com",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "test": "ava --verbose",
     "lint": "eslint ./src --ext .ts",

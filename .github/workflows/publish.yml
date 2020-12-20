@@ -3,12 +3,11 @@ name: Publish
 on:
   release:
     types:
-      - published
       - released
       - prereleased
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
