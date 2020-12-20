@@ -19,6 +19,6 @@ jobs:
         with:
           node-version: "14"
           registry-url: "https://npm.pkg.github.com"
-      - run: yarn publish
+      - run: yarn publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

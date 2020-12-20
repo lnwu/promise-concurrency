@@ -1,6 +1,6 @@
 {
   "name": "@lnwu/promise-concurrency",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Promise concurrency pool",
   "main": "lib/index.js",
   "repository": "https://github.com/lnwu/promise-concurrency",
