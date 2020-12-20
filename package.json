@@ -2,14 +2,15 @@
   "name": "promise-concurrency",
   "version": "1.0.0",
   "description": "Promise concurrency pool",
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": "https://github.com/ies-fe-sh/hire",
   "author": "longyinan.brooklyn@bytedance.com",
   "license": "MIT",
   "private": true,
   "scripts": {
     "test": "ava --verbose",
-    "lint": "eslint ./src --ext .ts"
+    "lint": "eslint ./src --ext .ts",
+    "build": "tsc --build tsconfig.production.json"
   },
   "devDependencies": {
     "@swc-node/register": "^1.0.1",
