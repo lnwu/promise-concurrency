@@ -67,7 +67,7 @@ export class PromiseConcurrencyController<T> {
           this.result.yield(resolvedValue);
         } catch (error) {
           // record error
-          console.error(error);
+          // console.error(error);
         } finally {
           this.activeTasks.shift();
           this.activeCount--;
