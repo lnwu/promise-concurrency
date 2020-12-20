@@ -17,4 +17,8 @@ jobs:
       - run: yarn
       - run: yarn test
       - run: yarn build
-      - run: npm publish
+      - name: Publish To Github Package
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          registry: https://npm.pkg.github.com/lnwu
+          token: ${{ secrets.GITHUB_TOKEN }}
