@@ -3,7 +3,9 @@ name: Publish
 on:
   release:
     types:
-      - created
+      - published
+      - released
+      - prereleased
 
 jobs:
   build:
