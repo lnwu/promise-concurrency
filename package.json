@@ -1,9 +1,9 @@
 {
-  "name": "promise-concurrency",
+  "name": "@lnwu/promise-concurrency",
   "version": "1.0.0",
   "description": "Promise concurrency pool",
   "main": "lib/index.js",
-  "repository": "https://github.com/ies-fe-sh/hire",
+  "repository": "https://github.com/lnwu/promise-concurrency",
   "author": "wind2729@gmail.com",
   "license": "MIT",
   "scripts": {

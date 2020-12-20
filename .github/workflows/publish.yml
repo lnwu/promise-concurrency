@@ -17,8 +17,4 @@ jobs:
       - run: yarn
       - run: yarn test
       - run: yarn build
-      - name: Publish To Github Packages
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: next
+      - run: npm publish
